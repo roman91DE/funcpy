@@ -1,8 +1,6 @@
 """Core functional programming utilities."""
 
-from collections.abc import Callable
-from os import stat
-from typing import TypeVar
+from typing import TypeVar, Callable
 
 A = TypeVar("A")
 B = TypeVar("B")
@@ -10,16 +8,36 @@ C = TypeVar("C")
 
 
 class List:
+    """Functional operations for Python lists."""
+    
     @staticmethod
     def map(f: Callable[[A], B], xs: list[A]) -> list[B]:
+        """Transform each element in a list by applying a function.
+        
+        Example:
+            List.map(lambda x: x * 2, [1, 2, 3]) -> [2, 4, 6]
+        """
         return [f(x) for x in xs]
 
     @staticmethod
     def filter(pred: Callable[[A], bool], xs: list[A]) -> list[A]:
+        """Keep only elements that satisfy a condition.
+        
+        Example:
+            List.filter(lambda x: x % 2 == 0, [1, 2, 3, 4]) -> [2, 4]
+        """
         return [x for x in xs if pred(x)]
 
     @staticmethod
     def foldl(f: Callable[[B, A], B], acc: B, xs: list[A]) -> B:
+        """Combine all elements of a list with a function, starting from the left.
+        
+        The accumulator starts with the initial value and is updated by applying
+        the function to the accumulator and each element in sequence.
+        
+        Example:
+            List.foldl(lambda acc, x: acc + x, 0, [1, 2, 3]) -> 6  # (((0 + 1) + 2) + 3)
+        """
         match xs:
             case [head, *rest]:
                 return List.foldl(f, f(acc, head), rest)
@@ -28,14 +46,80 @@ class List:
 
     @staticmethod
     def reverse(xs: list[A]) -> list[A]:
+        """Reverse the order of elements in a list.
+        
+        Example:
+            List.reverse([1, 2, 3]) -> [3, 2, 1]
+        """
         return List.foldl(lambda acc, x: [x] + acc, [], xs)
 
     @staticmethod
     def foldr(f: Callable[[A, B], B], acc: B, xs: list[A]) -> B:
+        """Combine all elements of a list with a function, starting from the right.
+        
+        Similar to foldl but works from right to left, which can give different 
+        results for non-commutative operations (like subtraction or division).
+        
+        Example:
+            List.foldr(lambda x, acc: x - acc, 0, [1, 2, 3]) -> 2  # (1 - (2 - (3 - 0)))
+        """
         return List.foldl(Functions.swap(f), acc, List.reverse(xs))
 
 
+class Dict:
+    """Functional operations for Python dictionaries."""
+
+    @staticmethod
+    def vmap(f: Callable[[A], B], d: dict[C, A]) -> dict[C, B]:
+        """Transform the values in a dictionary while keeping the keys the same.
+        
+        Example:
+            Dict.vmap(lambda v: v * 2, {'a': 1, 'b': 2}) -> {'a': 2, 'b': 4}
+        """
+        return {k: f(v) for (k,v) in d.items()}
+    
+    @staticmethod
+    def kmap(f: Callable[[A], B], d: dict[A, C]) -> dict[B, C]:
+        """Transform the keys in a dictionary while keeping the values the same.
+        
+        Example:
+            Dict.kmap(lambda k: k.upper(), {'a': 1, 'b': 2}) -> {'A': 1, 'B': 2}
+        """
+        return {f(k): v for (k,v) in d.items()}
+    
+    @staticmethod
+    def vfilter(pred: Callable[[A], bool], d: dict[B, A]) -> dict[B, A]:
+        """Keep only dictionary entries where the value passes a test.
+        
+        Example:
+            Dict.vfilter(lambda v: v > 1, {'a': 1, 'b': 2}) -> {'b': 2}
+        """
+        return {k: v for (k,v) in d.items() if pred(v)}
+    
+    @staticmethod
+    def kfilter(pred: Callable[[A], bool], d: dict[A, B]) -> dict[A, B]:
+        """Keep only dictionary entries where the key passes a test.
+        
+        Example:
+            Dict.kfilter(lambda k: k in ['a', 'c'], {'a': 1, 'b': 2}) -> {'a': 1}
+        """
+        return {k: v for (k,v) in d.items() if pred(k)}
+
+
+
 class Functions:
+    """Utility functions for working with functions."""
+    
     @staticmethod
     def swap(f: Callable[[A, B], C]) -> Callable[[B, A], C]:
+        """Reverse the order of arguments to a function.
+        
+        Creates a new function that calls the original function with arguments in reverse order.
+        
+        Example:
+            subtract = lambda a, b: a - b
+            swap_subtract = Functions.swap(subtract)
+            subtract(5, 3) -> 2
+            swap_subtract(5, 3) -> -2  # Equivalent to subtract(3, 5)
+        """
         return lambda a, b: f(b, a)
