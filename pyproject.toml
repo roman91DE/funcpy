@@ -1,0 +1,100 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "funcpy"
+version = "0.1.0"
+description = "Simple Functional Programming Tools for Python"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Developer"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "mypy",
+    "pytest",
+    "pytest-cov",
+]
+
+[project.urls]
+Documentation = "https://github.com/username/funcpy#readme"
+Issues = "https://github.com/username/funcpy/issues"
+Source = "https://github.com/username/funcpy"
+
+[project.scripts]
+funcpy = "funcpy.cli:main"
+
+# Development configuration
+[tool.hatch.build.targets.wheel]
+packages = ["src/funcpy"]
+
+# Ruff configuration
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+lint.select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "D",   # pydocstyle
+    "N",   # pep8-naming
+    "DTZ", # flake8-datetimez
+]
+lint.ignore = [
+    "D203", # one-blank-line-before-class (conflicts with D211)
+]
+src = ["src"]
+
+[tool.ruff.per-file-ignores]
+"tests/**/*.py" = ["D", "S"]
+"__init__.py" = ["F401"]
+
+[tool.ruff.pydocstyle]
+convention = "google"
+
+[tool.ruff.isort]
+known-first-party = ["funcpy"]
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_any_generics = false
+strict_optional = true
+check_untyped_defs = true
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+# Pytest configuration
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
