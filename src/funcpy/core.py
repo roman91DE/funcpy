@@ -107,6 +107,61 @@ class Dict:
 
 
 
+class Str:
+    """Functional operations for Python strings."""
+
+    @staticmethod
+    def map(f: Callable[[str], str], s: str) -> str:
+        """Transform each character in a string by applying a function.
+        
+        Example:
+            Str.map(lambda c: c.upper(), "hello") -> "HELLO"
+        """
+        return "".join(f(c) for c in s)
+
+    @staticmethod
+    def filter(pred: Callable[[str], bool], s: str) -> str:
+        """Keep only characters in a string that satisfy a condition.
+        
+        Example:
+            Str.filter(lambda c: c in "aeiou", "hello") -> "eo"
+        """
+        return "".join(c for c in s if pred(c))
+
+    @staticmethod
+    def foldl(f: Callable[[B, str], B], acc: B, s: str) -> B:
+        """Combine all characters of a string with a function, starting from the left.
+        
+        Example:
+            Str.foldl(lambda acc, c: acc + c.upper(), "", "hello") -> "HELLO"
+        """
+        for c in s:
+            acc = f(acc, c)
+        return acc
+
+    @staticmethod
+    def foldr(f: Callable[[str, B], B], acc: B, s: str) -> B:
+        """Combine all characters of a string with a function, starting from the right.
+        
+        Example:
+            Str.foldr(lambda c, acc: c.upper() + acc, "", "hello") -> "OLLEH"
+        """
+        for c in reversed(s):
+            acc = f(c, acc)
+        return acc
+
+    @staticmethod
+    def reverse(s: str) -> str:
+        """Reverse a string.
+        
+        Example:
+            Str.reverse("hello") -> "olleh"
+        """
+        return s[::-1]
+
+
+
+
 class Functions:
     """Utility functions for working with functions."""
     

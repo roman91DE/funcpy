@@ -107,3 +107,92 @@ def test_list_foldr_empty():
     a = []
     got = fp.List.foldr(add, 0, a)
     assert got == 0  # Initial accumulator is returned
+
+
+# String tests
+def test_str_map():
+    """Test Str.map function."""
+    s = "hello"
+    result = fp.Str.map(lambda c: c.upper(), s)
+    assert result == "HELLO"
+    
+    # Empty string
+    assert fp.Str.map(lambda c: c.upper(), "") == ""
+    
+    # Single character
+    assert fp.Str.map(lambda c: c.upper(), "a") == "A"
+    
+    # Special characters
+    assert fp.Str.map(lambda c: c + c, "abc") == "aabbcc"
+
+
+def test_str_filter():
+    """Test Str.filter function."""
+    s = "hello world"
+    result = fp.Str.filter(lambda c: c not in " aeiou", s)
+    assert result == "hllwrld"
+    
+    # Empty string
+    assert fp.Str.filter(lambda c: c != "x", "") == ""
+    
+    # No matches
+    assert fp.Str.filter(lambda c: c.isdigit(), "abcdef") == ""
+    
+    # All matches
+    assert fp.Str.filter(lambda c: c.isalpha(), "abcdef") == "abcdef"
+
+
+def test_str_foldl():
+    """Test Str.foldl function."""
+    s = "hello"
+    
+    # Count characters
+    result = fp.Str.foldl(lambda acc, _: acc + 1, 0, s)
+    assert result == 5
+    
+    # Build uppercase string
+    result = fp.Str.foldl(lambda acc, c: acc + c.upper(), "", s)
+    assert result == "HELLO"
+    
+    # Empty string
+    assert fp.Str.foldl(lambda acc, c: acc + c, "start", "") == "start"
+    
+    # Calculate checksum
+    result = fp.Str.foldl(lambda acc, c: acc + ord(c), 0, "abc")
+    assert result == ord('a') + ord('b') + ord('c')
+
+
+def test_str_foldr():
+    """Test Str.foldr function."""
+    s = "hello"
+    
+    # Build reversed uppercase string
+    result = fp.Str.foldr(lambda c, acc: acc + c.upper(), "", s)
+    assert result == "OLLEH"
+    
+    # Empty string
+    assert fp.Str.foldr(lambda c, acc: c + acc, "end", "") == "end"
+    
+    # Concatenate with separator
+    result = fp.Str.foldr(lambda c, acc: c + (":"+acc if acc else ""), "", "abc")
+    assert result == "a:b:c"
+
+
+def test_str_reverse():
+    """Test Str.reverse function."""
+    s = "hello"
+    result = fp.Str.reverse(s)
+    assert result == "olleh"
+    
+    # Empty string
+    assert fp.Str.reverse("") == ""
+    
+    # Single character
+    assert fp.Str.reverse("a") == "a"
+    
+    # Palindrome
+    assert fp.Str.reverse("racecar") == "racecar"
+    
+    # Special characters
+    assert fp.Str.reverse("!@#$") == "$#@!"
+
