@@ -1,6 +1,8 @@
 """Core functional programming utilities."""
 
-from typing import TypeVar, Callable
+import inspect
+from collections.abc import Callable
+from typing import Any, TypeVar
 
 A = TypeVar("A")
 B = TypeVar("B")
@@ -169,7 +171,8 @@ class Functions:
     def swap(f: Callable[[A, B], C]) -> Callable[[B, A], C]:
         """Reverse the order of arguments to a function.
         
-        Creates a new function that calls the original function with arguments in reverse order.
+        Creates a new function that calls the original function
+        with arguments in reverse order.
         
         Example:
             subtract = lambda a, b: a - b
@@ -178,3 +181,70 @@ class Functions:
             swap_subtract(5, 3) -> -2  # Equivalent to subtract(3, 5)
         """
         return lambda a, b: f(b, a)
+
+    @staticmethod
+    def compose(f: Callable[[B], C], g: Callable[[A], B]) -> Callable[[A], C]:
+        """Compose two functions into a new function.
+
+        Creates a new function that applies ``g`` first, then ``f`` to the result.
+        Equivalent to ``f(g(x))``.
+
+        Example:
+            add_one = lambda x: x + 1
+            double = lambda x: x * 2
+            Functions.compose(double, add_one)(3)  # (3 + 1) * 2 = 8
+        """
+        return lambda x: f(g(x))
+
+    @staticmethod
+    def pipe(value: Any, *fns: Callable[[Any], Any]) -> Any:
+        """Pipe a value through a series of transformations.
+
+        Applies each function in order, passing the result of each as input
+        to the next.
+
+        Example:
+            Functions.pipe(3, lambda x: x + 1, lambda x: x * 2)  # (3 + 1) * 2 = 8
+        """
+        result: Any = value
+        for f in fns:
+            result = f(result)
+        return result
+
+    @staticmethod
+    def curry(f: Callable[..., Any]) -> Callable[..., Any]:
+        """Curry a function for partial application.
+
+        Returns a chain of single-argument functions that collect arguments
+        one at a time. Once all required arguments are provided, the original
+        function is called.
+
+        Example:
+            add = Functions.curry(lambda x, y: x + y)
+            add_five = add(5)
+            add_five(10)  # 15
+        """
+        sig = inspect.signature(f)
+        n = len([
+            p for p in sig.parameters.values()
+            if p.default is inspect.Parameter.empty
+            and p.kind in (
+                inspect.Parameter.POSITIONAL_ONLY,
+                inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            )
+        ])
+
+        def _curry(args: tuple[Any, ...]) -> Callable[..., Any]:
+            def inner(*new_args: Any) -> Any:
+                all_args = args + new_args
+                if len(all_args) >= n:
+                    return f(*all_args)
+                return _curry(all_args)
+            return inner
+
+        return _curry(())
+
+
+compose = Functions.compose
+pipe = Functions.pipe
+curry = Functions.curry

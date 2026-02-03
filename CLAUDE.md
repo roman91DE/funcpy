@@ -8,11 +8,11 @@ FuncPy is a Python library providing simple functional programming tools — com
 
 ```
 src/funcpy/
-  __init__.py       # Package init, exports List, Dict, Functions, Str
-  core.py           # All core functionality (~180 lines)
+  __init__.py       # Package init, exports List, Dict, Functions, Str, compose, curry, pipe
+  core.py           # All core functionality (~230 lines)
 tests/
   __init__.py
-  test_core.py      # pytest test suite (~200 lines, 23 tests)
+  test_core.py      # pytest test suite (~280 lines, 30 tests)
 pyproject.toml      # Build config (hatchling), deps, tool settings
 ```
 
@@ -21,7 +21,15 @@ pyproject.toml      # Build config (hatchling), deps, tool settings
 - **`List`** — `map`, `filter`, `foldl`, `foldr`, `reverse` on Python lists
 - **`Dict`** — `vmap`, `kmap`, `vfilter`, `kfilter` on dicts
 - **`Str`** — `map`, `filter`, `foldl`, `foldr`, `reverse` on strings
-- **`Functions`** — `swap` (reverses binary function argument order)
+- **`Functions`** — `swap`, `compose`, `pipe`, `curry` (function composition and utilities)
+
+### Module-level aliases
+
+`compose`, `pipe`, and `curry` are also exported at module level for convenience:
+
+```python
+from funcpy.core import compose, pipe, curry
+```
 
 ## Build & Tooling
 
@@ -65,5 +73,4 @@ mypy src                      # Type check (strict mode)
 
 ## Known Gaps
 
-- README advertises `compose`, `pipe`, `curry` — these are **not yet implemented**
 - `pyproject.toml` defines CLI entry point `funcpy = "funcpy.cli:main"` — **`cli.py` does not exist**

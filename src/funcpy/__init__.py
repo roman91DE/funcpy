@@ -2,4 +2,4 @@
 
 __version__ = "0.1.0"
 
-from .core import List, Dict, Functions, Str
+from .core import Dict, Functions, List, Str, compose, curry, pipe
